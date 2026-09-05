@@ -23,20 +23,14 @@ export default function Registro() {
       return;
     }
 
-    const { data, error } = await supabase.auth.signUp({ email, password });
-    if (error || !data.user) {
-      setStatus(error?.message ?? "No se pudo crear la cuenta.");
-      return;
-    }
-
-    const { error: profileError } = await supabase.from("profiles").insert({
-      id: data.user.id,
-      full_name: fullName,
-      roles,
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { data: { full_name: fullName, roles } },
     });
 
-    if (profileError) {
-      setStatus(profileError.message);
+    if (error) {
+      setStatus(error.message);
       return;
     }
 
