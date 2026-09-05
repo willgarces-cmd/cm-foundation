@@ -43,3 +43,4 @@ config/verticals/       configuración por desafío del ecosistema CM
 lib/supabaseClient.ts   cliente de Supabase compartido
 supabase/schema.sql     esquema de base de datos + seed de categorías
 ```
+
