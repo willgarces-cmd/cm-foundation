@@ -1,9 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import BackLink from "@/components/BackLink";
 
 export default function Registro() {
+  const router = useRouter();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -35,15 +38,18 @@ export default function Registro() {
     }
 
     if (data.session) {
-      setStatus("Cuenta creada y sesión iniciada. Ya puedes usar la plataforma.");
+      setStatus("Cuenta creada y sesión iniciada.");
+      setTimeout(() => router.push("/"), 800);
     } else {
       setStatus("Cuenta creada. Revisa tu correo para confirmar y luego inicia sesión.");
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <h1 className="page-title">Crear cuenta</h1>
+    <div className="space-y-6">
+      <BackLink />
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <h1 className="page-title">Crear cuenta</h1>
 
       <div>
         <label className="block text-sm mb-1">Nombre completo</label>
@@ -83,7 +89,8 @@ export default function Registro() {
         Crear cuenta
       </button>
 
-      {status && <p className="text-sm text-gray-600">{status}</p>}
-    </form>
+        {status && <p className="text-sm text-gray-600">{status}</p>}
+      </form>
+    </div>
   );
 }

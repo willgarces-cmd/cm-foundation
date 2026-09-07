@@ -1,9 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import BackLink from "@/components/BackLink";
 
 export default function Login() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [status, setStatus] = useState<string | null>(null);
@@ -11,12 +14,18 @@ export default function Login() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setStatus(error ? error.message : "Sesión iniciada.");
+    if (error) {
+      setStatus(error.message);
+      return;
+    }
+    router.push("/");
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <h1 className="page-title">Iniciar sesión</h1>
+    <div className="space-y-6">
+      <BackLink />
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <h1 className="page-title">Iniciar sesión</h1>
 
       <div>
         <label className="block text-sm mb-1">Correo</label>
@@ -34,7 +43,8 @@ export default function Login() {
         Entrar
       </button>
 
-      {status && <p className="text-sm text-gray-600">{status}</p>}
-    </form>
+        {status && <p className="text-sm text-gray-600">{status}</p>}
+      </form>
+    </div>
   );
 }

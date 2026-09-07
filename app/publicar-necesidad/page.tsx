@@ -1,18 +1,19 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
-import { CM_SMART_HELP } from "@/config/verticals/cm-smart-help";
+import BackLink from "@/components/BackLink";
 
 const CATEGORY_SLUGS = ["plomeria", "electricidad", "pintura", "carpinteria", "cerrajeria", "gasfiteria", "jardineria"];
 
 export default function PublicarNecesidad() {
-  const [title, setTitle] = useState("");
+  const router = useRouter();
   const [description, setDescription] = useState("");
   const [categorySlug, setCategorySlug] = useState(CATEGORY_SLUGS[0]);
   const [urgencia, setUrgencia] = useState("media");
-  const [presupuesto, setPresupuesto] = useState("");
-  const [ubicacion, setUbicacion] = useState("");
+  const [ciudad, setCiudad] = useState("");
+  const [distrito, setDistrito] = useState("");
   const [status, setStatus] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -28,29 +29,39 @@ export default function PublicarNecesidad() {
     const { data: category } = await supabase
       .from("categories")
       .select("id")
-      .eq("vertical", CM_SMART_HELP.vertical)
+      .eq("vertical", "cm_smart_help")
       .eq("slug", categorySlug)
       .single();
 
     if (!category) {
-      setStatus("No se encontró la categoría. Verifica que el schema.sql ya corrió en Supabase.");
+      setStatus("No se encontró la categoría.");
       return;
     }
+
+    const title = description.length > 60 ? description.slice(0, 60) + "…" : description;
 
     const { error } = await supabase.from("requests").insert({
       seeker_id: userData.user.id,
       category_id: category.id,
       title,
       description,
-      custom_fields: { urgencia, presupuesto, ubicacion },
+      custom_fields: { urgencia, ciudad, distrito },
     });
 
-    setStatus(error ? error.message : "Necesidad publicada. Los especialistas de esa categoría podrán verla.");
+    if (error) {
+      setStatus(error.message);
+      return;
+    }
+
+    setStatus("Necesidad publicada. Los especialistas de esa categoría podrán verla.");
+    setTimeout(() => router.push("/"), 900);
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <h1 className="page-title">Publicar una necesidad</h1>
+    <div className="space-y-6">
+      <BackLink />
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <h1 className="page-title">Publicar una necesidad</h1>
 
       <div>
         <label className="block text-sm mb-1">Categoría</label>
@@ -63,15 +74,9 @@ export default function PublicarNecesidad() {
       </div>
 
       <div>
-        <label className="block text-sm mb-1">Título</label>
-        <input className="input-field" value={title}
-          onChange={(e) => setTitle(e.target.value)} required />
-      </div>
-
-      <div>
-        <label className="block text-sm mb-1">Descripción</label>
+        <label className="block text-sm mb-1">Cuéntanos qué necesitas</label>
         <textarea className="input-field" value={description}
-          onChange={(e) => setDescription(e.target.value)} rows={3} />
+          onChange={(e) => setDescription(e.target.value)} rows={4} required />
       </div>
 
       <div>
@@ -84,23 +89,25 @@ export default function PublicarNecesidad() {
         </select>
       </div>
 
-      <div>
-        <label className="block text-sm mb-1">Presupuesto estimado (S/)</label>
-        <input className="input-field" value={presupuesto}
-          onChange={(e) => setPresupuesto(e.target.value)} placeholder="ej. 100-200" />
-      </div>
-
-      <div>
-        <label className="block text-sm mb-1">Ubicación (comuna/zona)</label>
-        <input className="input-field" value={ubicacion}
-          onChange={(e) => setUbicacion(e.target.value)} required />
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label className="block text-sm mb-1">Ciudad</label>
+          <input className="input-field" value={ciudad}
+            onChange={(e) => setCiudad(e.target.value)} required />
+        </div>
+        <div>
+          <label className="block text-sm mb-1">Distrito</label>
+          <input className="input-field" value={distrito}
+            onChange={(e) => setDistrito(e.target.value)} required />
+        </div>
       </div>
 
       <button type="submit" className="btn-primary">
         Publicar
       </button>
 
-      {status && <p className="text-sm text-gray-600">{status}</p>}
-    </form>
+        {status && <p className="text-sm text-gray-600">{status}</p>}
+      </form>
+    </div>
   );
 }

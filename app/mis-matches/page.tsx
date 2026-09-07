@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import BackLink from "@/components/BackLink";
 
 export default function MisMatches() {
   const [userId, setUserId] = useState<string | null>(null);
@@ -45,7 +46,9 @@ export default function MisMatches() {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
+      <BackLink />
+      <div className="space-y-4">
       <h1 className="page-title">Mis matches</h1>
 
       {matches.length === 0 && <p className="text-gray-600 text-sm">Todavía no tienes matches.</p>}
@@ -57,6 +60,7 @@ export default function MisMatches() {
       </div>
 
       {status && <p className="text-sm text-gray-600">{status}</p>}
+      </div>
     </div>
   );
 }

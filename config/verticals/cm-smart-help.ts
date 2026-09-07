@@ -10,9 +10,8 @@ export const CM_SMART_HELP = {
   // Campos custom del Request (la necesidad del usuario)
   requestFields: [
     { key: "urgencia", label: "Urgencia", type: "select", options: ["baja", "media", "alta"] },
-    { key: "presupuesto", label: "Rango de presupuesto (S/)", type: "text" },
-    { key: "ubicacion", label: "Ubicación (comuna/zona)", type: "text" },
-    { key: "fotos", label: "Fotos del problema", type: "photos" },
+    { key: "ciudad", label: "Ciudad", type: "text" },
+    { key: "distrito", label: "Distrito", type: "text" },
   ],
 
   // Campos custom del Listing (perfil del especialista)

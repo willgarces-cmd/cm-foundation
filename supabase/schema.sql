@@ -161,6 +161,30 @@ create policy "reviews: el autor crea" on reviews for insert with check (author_
 create policy "verifications: el proveedor ve las suyas" on verifications for select using (provider_id = auth.uid());
 create policy "verifications: el proveedor sube documentos" on verifications for insert with check (provider_id = auth.uid());
 
+-- Cuando se crea un match, la necesidad deja de estar "abierta".
+-- Cuando el match se cierra, la necesidad queda "cerrada".
+-- Se hace vía trigger (security definer) porque el especialista que crea
+-- el match no es dueño de la fila `requests`, así que un update directo
+-- desde el cliente violaría RLS.
+create or replace function public.handle_match_status()
+returns trigger
+language plpgsql
+security definer set search_path = public
+as $$
+begin
+  if tg_op = 'INSERT' then
+    update requests set status = 'matched' where id = new.request_id and status = 'open';
+  elsif tg_op = 'UPDATE' and new.status = 'closed' and coalesce(old.status, '') <> 'closed' then
+    update requests set status = 'closed' where id = new.request_id;
+  end if;
+  return new;
+end;
+$$;
+
+create trigger on_match_change
+  after insert or update on matches
+  for each row execute function public.handle_match_status();
+
 -- ============================================================
 -- Seed — configuración del vertical CM Smart Help
 -- ============================================================

@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabaseClient";
+import BackLink from "@/components/BackLink";
 
 export const revalidate = 0;
 
@@ -10,8 +11,10 @@ export default async function Especialistas() {
     .order("created_at", { ascending: false });
 
   return (
-    <div className="space-y-4">
-      <h1 className="page-title">Especialistas disponibles</h1>
+    <div className="space-y-6">
+      <BackLink />
+      <div className="space-y-4">
+        <h1 className="page-title">Especialistas disponibles</h1>
 
       {error && <p className="text-sm text-red-600">{error.message}</p>}
       {!error && (!listings || listings.length === 0) && (
@@ -26,6 +29,7 @@ export default async function Especialistas() {
             {l.description && <p className="text-sm text-gray-700 mt-1">{l.description}</p>}
           </div>
         ))}
+      </div>
       </div>
     </div>
   );
