@@ -4,18 +4,22 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import BackLink from "@/components/BackLink";
+import { LIMA_DISTRITOS } from "@/config/lima-districts";
 
 const CATEGORY_SLUGS = ["plomeria", "electricidad", "pintura", "carpinteria", "cerrajeria", "gasfiteria", "jardineria"];
 
 export default function PublicarServicio() {
   const router = useRouter();
-  const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [categorySlug, setCategorySlug] = useState(CATEGORY_SLUGS[0]);
-  const [zonaCobertura, setZonaCobertura] = useState("");
+  const [zonaCobertura, setZonaCobertura] = useState<string[]>([]);
   const [certificaciones, setCertificaciones] = useState("");
   const [portafolio, setPortafolio] = useState("");
   const [status, setStatus] = useState<string | null>(null);
+
+  const toggleDistrito = (d: string) => {
+    setZonaCobertura((prev) => (prev.includes(d) ? prev.filter((x) => x !== d) : [...prev, d]));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,6 +28,11 @@ export default function PublicarServicio() {
     const { data: userData } = await supabase.auth.getUser();
     if (!userData.user) {
       setStatus("Inicia sesión primero para publicar tu servicio.");
+      return;
+    }
+
+    if (zonaCobertura.length === 0) {
+      setStatus("Selecciona al menos un distrito de cobertura.");
       return;
     }
 
@@ -38,6 +47,8 @@ export default function PublicarServicio() {
       setStatus("No se encontró la categoría.");
       return;
     }
+
+    const title = description.length > 60 ? description.slice(0, 60) + "…" : description;
 
     const { error } = await supabase.from("listings").insert({
       provider_id: userData.user.id,
@@ -73,21 +84,22 @@ export default function PublicarServicio() {
         </div>
 
         <div>
-          <label className="block text-sm mb-1">Título de tu servicio</label>
-          <input className="input-field" value={title}
-            onChange={(e) => setTitle(e.target.value)} required />
-        </div>
-
-        <div>
-          <label className="block text-sm mb-1">Descripción</label>
+          <label className="block text-sm mb-1">Describe tu servicio</label>
           <textarea className="input-field" value={description}
-            onChange={(e) => setDescription(e.target.value)} rows={3} />
+            onChange={(e) => setDescription(e.target.value)} rows={4} required />
         </div>
 
         <div>
-          <label className="block text-sm mb-1">Zona de cobertura</label>
-          <input className="input-field" value={zonaCobertura}
-            onChange={(e) => setZonaCobertura(e.target.value)} required />
+          <label className="block text-sm mb-2">Distritos donde das cobertura</label>
+          <div className="grid grid-cols-2 gap-1 max-h-56 overflow-y-auto border border-line rounded-md p-3">
+            {LIMA_DISTRITOS.map((d) => (
+              <label key={d} className="flex items-center gap-2 text-sm">
+                <input type="checkbox" checked={zonaCobertura.includes(d)}
+                  onChange={() => toggleDistrito(d)} />
+                {d}
+              </label>
+            ))}
+          </div>
         </div>
 
         <div>

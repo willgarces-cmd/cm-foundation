@@ -185,6 +185,28 @@ create trigger on_match_change
   after insert or update on matches
   for each row execute function public.handle_match_status();
 
+-- Permitir borrar una cuenta (profiles) limpiamente en cascada,
+-- incluyendo lo que faltaba: mensajes, transacciones, reseñas y verificaciones.
+alter table messages
+  drop constraint messages_sender_id_fkey,
+  add constraint messages_sender_id_fkey foreign key (sender_id) references profiles(id) on delete cascade;
+
+alter table transactions
+  drop constraint transactions_payer_id_fkey,
+  add constraint transactions_payer_id_fkey foreign key (payer_id) references profiles(id) on delete cascade;
+
+alter table reviews
+  drop constraint reviews_author_id_fkey,
+  add constraint reviews_author_id_fkey foreign key (author_id) references profiles(id) on delete cascade;
+
+alter table reviews
+  drop constraint reviews_recipient_id_fkey,
+  add constraint reviews_recipient_id_fkey foreign key (recipient_id) references profiles(id) on delete cascade;
+
+alter table verifications
+  drop constraint verifications_provider_id_fkey,
+  add constraint verifications_provider_id_fkey foreign key (provider_id) references profiles(id) on delete cascade;
+
 -- ============================================================
 -- Seed — configuración del vertical CM Smart Help
 -- ============================================================

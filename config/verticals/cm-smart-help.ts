@@ -10,14 +10,14 @@ export const CM_SMART_HELP = {
   // Campos custom del Request (la necesidad del usuario)
   requestFields: [
     { key: "urgencia", label: "Urgencia", type: "select", options: ["baja", "media", "alta"] },
-    { key: "ciudad", label: "Ciudad", type: "text" },
-    { key: "distrito", label: "Distrito", type: "text" },
+    { key: "ciudad", label: "Ciudad", type: "fixed", default: "Lima" },
+    { key: "distrito", label: "Distrito", type: "select" }, // opciones: ver config/lima-districts.ts
   ],
 
   // Campos custom del Listing (perfil del especialista)
   listingFields: [
-    { key: "zona_cobertura", label: "Zona de cobertura", type: "text" },
-    { key: "certificaciones", label: "Certificaciones / documentos", type: "photos" },
-    { key: "portafolio", label: "Portafolio de trabajos anteriores", type: "photos" },
+    { key: "zona_cobertura", label: "Distritos de cobertura", type: "multi-select" }, // opciones: ver config/lima-districts.ts
+    { key: "certificaciones", label: "Certificaciones / documentos", type: "text" }, // texto por ahora, fotos pendiente
+    { key: "portafolio", label: "Portafolio de trabajos anteriores", type: "text" }, // texto por ahora, fotos pendiente
   ],
 } as const;

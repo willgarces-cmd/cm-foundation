@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import BackLink from "@/components/BackLink";
+import { LIMA_DISTRITOS } from "@/config/lima-districts";
 
 const CATEGORY_SLUGS = ["plomeria", "electricidad", "pintura", "carpinteria", "cerrajeria", "gasfiteria", "jardineria"];
 
@@ -12,8 +13,7 @@ export default function PublicarNecesidad() {
   const [description, setDescription] = useState("");
   const [categorySlug, setCategorySlug] = useState(CATEGORY_SLUGS[0]);
   const [urgencia, setUrgencia] = useState("media");
-  const [ciudad, setCiudad] = useState("");
-  const [distrito, setDistrito] = useState("");
+  const [distrito, setDistrito] = useState<string>(LIMA_DISTRITOS[0]);
   const [status, setStatus] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -45,7 +45,7 @@ export default function PublicarNecesidad() {
       category_id: category.id,
       title,
       description,
-      custom_fields: { urgencia, ciudad, distrito },
+      custom_fields: { urgencia, ciudad: "Lima", distrito },
     });
 
     if (error) {
@@ -63,48 +63,51 @@ export default function PublicarNecesidad() {
       <form onSubmit={handleSubmit} className="space-y-4">
         <h1 className="page-title">Publicar una necesidad</h1>
 
-      <div>
-        <label className="block text-sm mb-1">Categoría</label>
-        <select className="input-field" value={categorySlug}
-          onChange={(e) => setCategorySlug(e.target.value)}>
-          {CATEGORY_SLUGS.map((slug) => (
-            <option key={slug} value={slug}>{slug}</option>
-          ))}
-        </select>
-      </div>
-
-      <div>
-        <label className="block text-sm mb-1">Cuéntanos qué necesitas</label>
-        <textarea className="input-field" value={description}
-          onChange={(e) => setDescription(e.target.value)} rows={4} required />
-      </div>
-
-      <div>
-        <label className="block text-sm mb-1">Urgencia</label>
-        <select className="input-field" value={urgencia}
-          onChange={(e) => setUrgencia(e.target.value)}>
-          <option value="baja">Baja</option>
-          <option value="media">Media</option>
-          <option value="alta">Alta — necesito hoy</option>
-        </select>
-      </div>
-
-      <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="block text-sm mb-1">Ciudad</label>
-          <input className="input-field" value={ciudad}
-            onChange={(e) => setCiudad(e.target.value)} required />
+          <label className="block text-sm mb-1">Categoría</label>
+          <select className="input-field" value={categorySlug}
+            onChange={(e) => setCategorySlug(e.target.value)}>
+            {CATEGORY_SLUGS.map((slug) => (
+              <option key={slug} value={slug}>{slug}</option>
+            ))}
+          </select>
         </div>
-        <div>
-          <label className="block text-sm mb-1">Distrito</label>
-          <input className="input-field" value={distrito}
-            onChange={(e) => setDistrito(e.target.value)} required />
-        </div>
-      </div>
 
-      <button type="submit" className="btn-primary">
-        Publicar
-      </button>
+        <div>
+          <label className="block text-sm mb-1">Cuéntanos qué necesitas</label>
+          <textarea className="input-field" value={description}
+            onChange={(e) => setDescription(e.target.value)} rows={4} required />
+        </div>
+
+        <div>
+          <label className="block text-sm mb-1">Urgencia</label>
+          <select className="input-field" value={urgencia}
+            onChange={(e) => setUrgencia(e.target.value)}>
+            <option value="baja">Baja</option>
+            <option value="media">Media</option>
+            <option value="alta">Alta — necesito hoy</option>
+          </select>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="block text-sm mb-1">Ciudad</label>
+            <input className="input-field bg-gray-100 text-gray-500" value="Lima" disabled />
+          </div>
+          <div>
+            <label className="block text-sm mb-1">Distrito</label>
+            <select className="input-field" value={distrito}
+              onChange={(e) => setDistrito(e.target.value)}>
+              {LIMA_DISTRITOS.map((d) => (
+                <option key={d} value={d}>{d}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <button type="submit" className="btn-primary">
+          Publicar
+        </button>
 
         {status && <p className="text-sm text-gray-600">{status}</p>}
       </form>

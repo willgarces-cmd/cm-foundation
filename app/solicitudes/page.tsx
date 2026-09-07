@@ -6,10 +6,10 @@ import BackLink from "@/components/BackLink";
 
 function UrgenciaBadge({ nivel }: { nivel: string }) {
   if (nivel === "alta")
-    return <span className="text-xs font-medium text-white bg-accent rounded px-2 py-0.5">Urgente — hoy</span>;
+    return <span className="text-xs font-medium text-white bg-red-600 rounded px-2 py-0.5">Urgente — hoy</span>;
   if (nivel === "media")
-    return <span className="text-xs font-medium text-ink border border-line rounded px-2 py-0.5">Urgencia media</span>;
-  return <span className="text-xs text-gray-500">Urgencia baja</span>;
+    return <span className="text-xs font-medium text-ink bg-amber-400 rounded px-2 py-0.5">Urgencia media</span>;
+  return <span className="text-xs font-medium text-white bg-green-600 rounded px-2 py-0.5">Urgencia baja</span>;
 }
 
 export default function Solicitudes() {
