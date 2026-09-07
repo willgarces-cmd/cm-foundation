@@ -18,7 +18,7 @@ export default function Login() {
       setStatus(error.message);
       return;
     }
-    router.push("/");
+    router.push("/menu");
   };
 
   return (
@@ -42,6 +42,10 @@ export default function Login() {
       <button type="submit" className="btn-primary">
         Entrar
       </button>
+
+      <a href="/recuperar-password" className="block text-sm text-accent underline">
+        ¿Olvidaste tu contraseña?
+      </a>
 
         {status && <p className="text-sm text-gray-600">{status}</p>}
       </form>

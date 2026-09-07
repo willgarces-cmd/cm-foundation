@@ -39,7 +39,7 @@ export default function Registro() {
 
     if (data.session) {
       setStatus("Cuenta creada y sesión iniciada.");
-      setTimeout(() => router.push("/"), 800);
+      setTimeout(() => router.push("/menu"), 800);
     } else {
       setStatus("Cuenta creada. Revisa tu correo para confirmar y luego inicia sesión.");
     }

@@ -6,12 +6,17 @@ import { supabase } from "@/lib/supabaseClient";
 
 export default function HeaderNav() {
   const [loggedIn, setLoggedIn] = useState<boolean | null>(null);
+  const [name, setName] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => setLoggedIn(!!data.session));
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+    const syncSession = (session: any) => {
       setLoggedIn(!!session);
+      setName(session?.user?.user_metadata?.full_name ?? null);
+    };
+    supabase.auth.getSession().then(({ data }) => syncSession(data.session));
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      syncSession(session);
     });
     return () => listener.subscription.unsubscribe();
   }, []);
@@ -26,9 +31,12 @@ export default function HeaderNav() {
   return (
     <nav className="flex gap-4 text-sm items-center">
       {loggedIn ? (
-        <button onClick={cerrarSesion} className="text-ink hover:text-accent">
-          Cerrar sesión
-        </button>
+        <>
+          {name && <span className="text-ink font-medium">Hola, {name.split(" ")[0]}</span>}
+          <button onClick={cerrarSesion} className="text-gray-500 hover:text-accent">
+            Cerrar sesión
+          </button>
+        </>
       ) : (
         <>
           <a href="/login" className="text-ink hover:text-accent">Iniciar sesión</a>

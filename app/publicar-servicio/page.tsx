@@ -53,7 +53,7 @@ export default function PublicarServicio() {
     }
 
     setStatus("Servicio publicado. Los usuarios de esa categoría podrán verte.");
-    setTimeout(() => router.push("/"), 900);
+    setTimeout(() => router.push("/menu"), 900);
   };
 
   return (

@@ -54,7 +54,7 @@ export default function PublicarNecesidad() {
     }
 
     setStatus("Necesidad publicada. Los especialistas de esa categoría podrán verla.");
-    setTimeout(() => router.push("/"), 900);
+    setTimeout(() => router.push("/menu"), 900);
   };
 
   return (
