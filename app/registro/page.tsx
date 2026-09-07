@@ -23,7 +23,7 @@ export default function Registro() {
       return;
     }
 
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: { data: { full_name: fullName, roles } },
@@ -34,28 +34,32 @@ export default function Registro() {
       return;
     }
 
-    setStatus("Cuenta creada. Revisa tu correo para confirmar y luego inicia sesión.");
+    if (data.session) {
+      setStatus("Cuenta creada y sesión iniciada. Ya puedes usar la plataforma.");
+    } else {
+      setStatus("Cuenta creada. Revisa tu correo para confirmar y luego inicia sesión.");
+    }
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <h1 className="text-xl font-medium">Crear cuenta</h1>
+      <h1 className="page-title">Crear cuenta</h1>
 
       <div>
         <label className="block text-sm mb-1">Nombre completo</label>
-        <input className="border rounded-lg w-full px-3 py-2" value={fullName}
+        <input className="input-field" value={fullName}
           onChange={(e) => setFullName(e.target.value)} required />
       </div>
 
       <div>
         <label className="block text-sm mb-1">Correo</label>
-        <input type="email" className="border rounded-lg w-full px-3 py-2" value={email}
+        <input type="email" className="input-field" value={email}
           onChange={(e) => setEmail(e.target.value)} required />
       </div>
 
       <div>
         <label className="block text-sm mb-1">Contraseña</label>
-        <input type="password" className="border rounded-lg w-full px-3 py-2" value={password}
+        <input type="password" className="input-field" value={password}
           onChange={(e) => setPassword(e.target.value)} required minLength={6} />
       </div>
 
@@ -75,7 +79,7 @@ export default function Registro() {
         </div>
       </div>
 
-      <button type="submit" className="bg-gray-900 text-white rounded-lg px-4 py-2">
+      <button type="submit" className="btn-primary">
         Crear cuenta
       </button>
 

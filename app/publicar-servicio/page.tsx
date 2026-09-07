@@ -2,17 +2,16 @@
 
 import { useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
-import { CM_SMART_HELP } from "@/config/verticals/cm-smart-help";
 
 const CATEGORY_SLUGS = ["plomeria", "electricidad", "pintura", "carpinteria", "cerrajeria", "gasfiteria", "jardineria"];
 
-export default function PublicarNecesidad() {
+export default function PublicarServicio() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [categorySlug, setCategorySlug] = useState(CATEGORY_SLUGS[0]);
-  const [urgencia, setUrgencia] = useState("media");
-  const [presupuesto, setPresupuesto] = useState("");
-  const [ubicacion, setUbicacion] = useState("");
+  const [zonaCobertura, setZonaCobertura] = useState("");
+  const [certificaciones, setCertificaciones] = useState("");
+  const [portafolio, setPortafolio] = useState("");
   const [status, setStatus] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -21,36 +20,36 @@ export default function PublicarNecesidad() {
 
     const { data: userData } = await supabase.auth.getUser();
     if (!userData.user) {
-      setStatus("Inicia sesión primero para publicar una necesidad.");
+      setStatus("Inicia sesión primero para publicar tu servicio.");
       return;
     }
 
     const { data: category } = await supabase
       .from("categories")
       .select("id")
-      .eq("vertical", CM_SMART_HELP.vertical)
+      .eq("vertical", "cm_smart_help")
       .eq("slug", categorySlug)
       .single();
 
     if (!category) {
-      setStatus("No se encontró la categoría. Verifica que el schema.sql ya corrió en Supabase.");
+      setStatus("No se encontró la categoría.");
       return;
     }
 
-    const { error } = await supabase.from("requests").insert({
-      seeker_id: userData.user.id,
+    const { error } = await supabase.from("listings").insert({
+      provider_id: userData.user.id,
       category_id: category.id,
       title,
       description,
-      custom_fields: { urgencia, presupuesto, ubicacion },
+      custom_fields: { zona_cobertura: zonaCobertura, certificaciones, portafolio },
     });
 
-    setStatus(error ? error.message : "Necesidad publicada. Los especialistas de esa categoría podrán verla.");
+    setStatus(error ? error.message : "Servicio publicado. Los usuarios de esa categoría podrán verte.");
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <h1 className="page-title">Publicar una necesidad</h1>
+      <h1 className="page-title">Publicar mi servicio</h1>
 
       <div>
         <label className="block text-sm mb-1">Categoría</label>
@@ -63,7 +62,7 @@ export default function PublicarNecesidad() {
       </div>
 
       <div>
-        <label className="block text-sm mb-1">Título</label>
+        <label className="block text-sm mb-1">Título de tu servicio</label>
         <input className="input-field" value={title}
           onChange={(e) => setTitle(e.target.value)} required />
       </div>
@@ -75,29 +74,25 @@ export default function PublicarNecesidad() {
       </div>
 
       <div>
-        <label className="block text-sm mb-1">Urgencia</label>
-        <select className="input-field" value={urgencia}
-          onChange={(e) => setUrgencia(e.target.value)}>
-          <option value="baja">Baja</option>
-          <option value="media">Media</option>
-          <option value="alta">Alta — necesito hoy</option>
-        </select>
+        <label className="block text-sm mb-1">Zona de cobertura</label>
+        <input className="input-field" value={zonaCobertura}
+          onChange={(e) => setZonaCobertura(e.target.value)} required />
       </div>
 
       <div>
-        <label className="block text-sm mb-1">Presupuesto estimado (S/)</label>
-        <input className="input-field" value={presupuesto}
-          onChange={(e) => setPresupuesto(e.target.value)} placeholder="ej. 100-200" />
+        <label className="block text-sm mb-1">Certificaciones (texto por ahora, fotos vienen después)</label>
+        <input className="input-field" value={certificaciones}
+          onChange={(e) => setCertificaciones(e.target.value)} />
       </div>
 
       <div>
-        <label className="block text-sm mb-1">Ubicación (comuna/zona)</label>
-        <input className="input-field" value={ubicacion}
-          onChange={(e) => setUbicacion(e.target.value)} required />
+        <label className="block text-sm mb-1">Portafolio (texto o links por ahora)</label>
+        <input className="input-field" value={portafolio}
+          onChange={(e) => setPortafolio(e.target.value)} />
       </div>
 
       <button type="submit" className="btn-primary">
-        Publicar
+        Publicar servicio
       </button>
 
       {status && <p className="text-sm text-gray-600">{status}</p>}

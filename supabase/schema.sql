@@ -134,6 +134,13 @@ create policy "matches: partes involucradas" on matches for select using (
   exists (select 1 from listings l where l.id = listing_id and l.provider_id = auth.uid())
   or exists (select 1 from requests r where r.id = request_id and r.seeker_id = auth.uid())
 );
+create policy "matches: el proveedor crea el match" on matches for insert with check (
+  exists (select 1 from listings l where l.id = listing_id and l.provider_id = auth.uid())
+);
+create policy "matches: partes actualizan estado" on matches for update using (
+  exists (select 1 from listings l where l.id = listing_id and l.provider_id = auth.uid())
+  or exists (select 1 from requests r where r.id = request_id and r.seeker_id = auth.uid())
+);
 
 create policy "messages: partes del match" on messages for select using (
   exists (

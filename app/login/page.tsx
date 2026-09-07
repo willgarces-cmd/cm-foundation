@@ -16,21 +16,21 @@ export default function Login() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <h1 className="text-xl font-medium">Iniciar sesión</h1>
+      <h1 className="page-title">Iniciar sesión</h1>
 
       <div>
         <label className="block text-sm mb-1">Correo</label>
-        <input type="email" className="border rounded-lg w-full px-3 py-2" value={email}
+        <input type="email" className="input-field" value={email}
           onChange={(e) => setEmail(e.target.value)} required />
       </div>
 
       <div>
         <label className="block text-sm mb-1">Contraseña</label>
-        <input type="password" className="border rounded-lg w-full px-3 py-2" value={password}
+        <input type="password" className="input-field" value={password}
           onChange={(e) => setPassword(e.target.value)} required />
       </div>
 
-      <button type="submit" className="bg-gray-900 text-white rounded-lg px-4 py-2">
+      <button type="submit" className="btn-primary">
         Entrar
       </button>
 
