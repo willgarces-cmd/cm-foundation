@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { CheckCircle2 } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
-import BackLink from "@/components/BackLink";
+import CategoryPicker from "@/components/CategoryPicker";
 import { LIMA_DISTRITOS } from "@/config/lima-districts";
 
 export default function PublicarServicio() {
@@ -15,6 +16,7 @@ export default function PublicarServicio() {
   const [certificaciones, setCertificaciones] = useState("");
   const [portafolio, setPortafolio] = useState("");
   const [status, setStatus] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
   useEffect(() => {
     const loadCategories = async () => {
@@ -63,63 +65,65 @@ export default function PublicarServicio() {
       return;
     }
 
-    setStatus("Servicio publicado. Los usuarios de esa categoría podrán verte.");
-    setTimeout(() => router.push("/menu"), 900);
+    setSuccess(true);
+    setTimeout(() => router.push("/menu"), 1100);
   };
 
+  if (success) {
+    return (
+      <div className="flex flex-col items-center justify-center gap-3 py-20 text-center">
+        <CheckCircle2 size={48} className="text-green-600" />
+        <p className="font-medium">Servicio publicado</p>
+        <p className="text-sm text-gray-500">Los usuarios de esa categoría podrán verte.</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-6">
-      <BackLink />
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <h1 className="page-title">Publicar mi servicio</h1>
+    <form onSubmit={handleSubmit} className="space-y-5">
+      <h1 className="page-title">Publicar mi servicio</h1>
 
-        <div>
-          <label className="block text-sm mb-1">Categoría</label>
-          <select className="input-field" value={categoryId}
-            onChange={(e) => setCategoryId(e.target.value)}>
-            {categories.map((c) => (
-              <option key={c.id} value={c.id}>{c.name}</option>
-            ))}
-          </select>
+      <div>
+        <label className="block text-sm mb-2">Categoría</label>
+        <CategoryPicker categories={categories} value={categoryId} onChange={setCategoryId} />
+      </div>
+
+      <div>
+        <label className="block text-sm mb-1">Describe tu servicio</label>
+        <textarea className="input-field" value={description}
+          onChange={(e) => setDescription(e.target.value)} rows={4} required />
+      </div>
+
+      <div>
+        <label className="block text-sm mb-2">Distritos donde das cobertura</label>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 max-h-56 overflow-y-auto border border-line rounded-md p-3">
+          {LIMA_DISTRITOS.map((d) => (
+            <label key={d} className="flex items-center gap-2 text-sm">
+              <input type="checkbox" checked={zonaCobertura.includes(d)}
+                onChange={() => toggleDistrito(d)} />
+              {d}
+            </label>
+          ))}
         </div>
+      </div>
 
-        <div>
-          <label className="block text-sm mb-1">Describe tu servicio</label>
-          <textarea className="input-field" value={description}
-            onChange={(e) => setDescription(e.target.value)} rows={4} required />
-        </div>
+      <div>
+        <label className="block text-sm mb-1">Certificaciones (texto por ahora, fotos vienen después)</label>
+        <input className="input-field" value={certificaciones}
+          onChange={(e) => setCertificaciones(e.target.value)} />
+      </div>
 
-        <div>
-          <label className="block text-sm mb-2">Distritos donde das cobertura</label>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 max-h-56 overflow-y-auto border border-line rounded-md p-3">
-            {LIMA_DISTRITOS.map((d) => (
-              <label key={d} className="flex items-center gap-2 text-sm">
-                <input type="checkbox" checked={zonaCobertura.includes(d)}
-                  onChange={() => toggleDistrito(d)} />
-                {d}
-              </label>
-            ))}
-          </div>
-        </div>
+      <div>
+        <label className="block text-sm mb-1">Portafolio (texto o links por ahora)</label>
+        <input className="input-field" value={portafolio}
+          onChange={(e) => setPortafolio(e.target.value)} />
+      </div>
 
-        <div>
-          <label className="block text-sm mb-1">Certificaciones (texto por ahora, fotos vienen después)</label>
-          <input className="input-field" value={certificaciones}
-            onChange={(e) => setCertificaciones(e.target.value)} />
-        </div>
+      <button type="submit" className="btn-primary w-full" disabled={!categoryId}>
+        Publicar servicio
+      </button>
 
-        <div>
-          <label className="block text-sm mb-1">Portafolio (texto o links por ahora)</label>
-          <input className="input-field" value={portafolio}
-            onChange={(e) => setPortafolio(e.target.value)} />
-        </div>
-
-        <button type="submit" className="btn-primary" disabled={!categoryId}>
-          Publicar servicio
-        </button>
-
-        {status && <p className="text-sm text-gray-600">{status}</p>}
-      </form>
-    </div>
+      {status && <p className="text-sm text-gray-600">{status}</p>}
+    </form>
   );
 }

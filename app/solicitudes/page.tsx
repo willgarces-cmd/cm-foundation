@@ -1,15 +1,28 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Inbox, AlertTriangle, Clock, CheckCircle2, Loader2 } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
-import BackLink from "@/components/BackLink";
+import { getCategoryIcon } from "@/config/category-icons";
 
 function UrgenciaBadge({ nivel }: { nivel: string }) {
   if (nivel === "alta")
-    return <span className="text-xs font-medium text-white bg-red-600 rounded px-2 py-0.5">Urgente — hoy</span>;
+    return (
+      <span className="inline-flex items-center gap-1 text-xs font-medium text-white bg-red-600 rounded px-2 py-0.5">
+        <AlertTriangle size={12} /> Urgente — hoy
+      </span>
+    );
   if (nivel === "media")
-    return <span className="text-xs font-medium text-ink bg-amber-400 rounded px-2 py-0.5">Urgencia media</span>;
-  return <span className="text-xs font-medium text-white bg-green-600 rounded px-2 py-0.5">Urgencia baja</span>;
+    return (
+      <span className="inline-flex items-center gap-1 text-xs font-medium text-ink bg-amber-400 rounded px-2 py-0.5">
+        <Clock size={12} /> Urgencia media
+      </span>
+    );
+  return (
+    <span className="inline-flex items-center gap-1 text-xs font-medium text-white bg-green-600 rounded px-2 py-0.5">
+      <CheckCircle2 size={12} /> Urgencia baja
+    </span>
+  );
 }
 
 export default function Solicitudes() {
@@ -58,51 +71,65 @@ export default function Solicitudes() {
       setStatus(error.message);
       return;
     }
-    setStatus("Contacto enviado. Revisa 'Mis matches' para seguir.");
+    setStatus("Contacto enviado. Revisa 'Matches' para seguir.");
     setRequests((prev) => prev.filter((r) => r.id !== requestId));
   };
 
+  if (!loaded) {
+    return (
+      <div className="flex justify-center py-20 text-gray-400">
+        <Loader2 className="animate-spin" size={28} />
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-6">
-      <BackLink />
-      <div className="space-y-4">
+    <div className="space-y-4">
       <h1 className="page-title">Necesidades abiertas en tu especialidad</h1>
 
-      {loaded && myListings.length === 0 && (
+      {myListings.length === 0 && (
         <p className="text-gray-600 text-sm">
           Todavía no publicaste tu servicio, así que no sabemos en qué categoría mostrarte necesidades.{" "}
           <a href="/publicar-servicio" className="text-accent underline">Publica tu servicio primero</a>.
         </p>
       )}
 
-      {loaded && myListings.length > 0 && requests.length === 0 && (
-        <p className="text-gray-600 text-sm">No hay necesidades abiertas en tu especialidad por ahora.</p>
+      {myListings.length > 0 && requests.length === 0 && (
+        <div className="flex flex-col items-center text-center gap-2 py-16 text-gray-400">
+          <Inbox size={40} strokeWidth={1.5} />
+          <p className="text-sm">No hay necesidades abiertas en tu especialidad por ahora.</p>
+        </div>
       )}
 
       <div className="space-y-3">
-        {requests.map((r: any) => (
-          <div key={r.id} className="card space-y-2">
-            <div className="flex items-center justify-between">
-              <p className="text-sm text-gray-500">{r.categories?.name}</p>
-              <UrgenciaBadge nivel={r.custom_fields?.urgencia} />
+        {requests.map((r: any) => {
+          const Icon = getCategoryIcon(r.categories?.name);
+          return (
+            <div key={r.id} className="card space-y-2">
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <Icon size={16} className="text-gray-400" />
+                  <p className="text-sm text-gray-500">{r.categories?.name}</p>
+                </div>
+                <UrgenciaBadge nivel={r.custom_fields?.urgencia} />
+              </div>
+              <p className="font-medium">{r.description || r.title}</p>
+              {(r.custom_fields?.ciudad || r.custom_fields?.distrito) && (
+                <p className="text-sm text-gray-500">
+                  {r.custom_fields?.distrito}
+                  {r.custom_fields?.distrito && r.custom_fields?.ciudad ? ", " : ""}
+                  {r.custom_fields?.ciudad}
+                </p>
+              )}
+              <button onClick={() => contactar(r.id, r.category_id)} className="btn-primary btn-sm">
+                Contactar con mi servicio
+              </button>
             </div>
-            <p className="font-medium">{r.description || r.title}</p>
-            {(r.custom_fields?.ciudad || r.custom_fields?.distrito) && (
-              <p className="text-sm text-gray-500">
-                {r.custom_fields?.distrito}
-                {r.custom_fields?.distrito && r.custom_fields?.ciudad ? ", " : ""}
-                {r.custom_fields?.ciudad}
-              </p>
-            )}
-            <button onClick={() => contactar(r.id, r.category_id)} className="btn-primary btn-sm">
-              Contactar con mi servicio
-            </button>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {status && <p className="text-sm text-gray-600">{status}</p>}
-      </div>
     </div>
   );
 }

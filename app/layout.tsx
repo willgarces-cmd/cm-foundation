@@ -1,5 +1,6 @@
 import "./globals.css";
 import HeaderNav from "@/components/HeaderNav";
+import BottomNav from "@/components/BottomNav";
 
 export const metadata = {
   title: "CM Smart Help",
@@ -21,13 +22,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <a href="/" className="font-semibold text-lg">CM Smart Help</a>
           <HeaderNav />
         </header>
-        <main className="max-w-2xl mx-auto px-4 sm:px-6 py-10">{children}</main>
+        <main className="max-w-2xl mx-auto px-4 sm:px-6 py-8 pb-24">{children}</main>
         <footer className="border-t border-line px-4 sm:px-6 py-6 text-center text-xs text-gray-400">
           CM Smart Help — plataforma en fase piloto. ¿Problemas o dudas?{" "}
           <a href="mailto:soporte@cmsmarthelp.com" className="text-accent hover:underline">
             soporte@cmsmarthelp.com
           </a>
         </footer>
+        <BottomNav />
       </body>
     </html>
   );
