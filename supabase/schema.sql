@@ -285,6 +285,90 @@ create policy "messages: enviar si eres parte" on messages for insert with check
 );
 
 -- ============================================================
+-- Corrección de privacidad: el teléfono NO debe ser público.
+-- Se mueve a una tabla aparte sin política de lectura pública —
+-- solo el dueño la edita, y solo se revela vía función controlada
+-- cuando el match ya está "active" (ambas partes confirmaron).
+-- ============================================================
+alter table profiles drop column if exists phone;
+
+create table profile_private (
+  profile_id uuid primary key references profiles(id) on delete cascade,
+  phone text
+);
+
+alter table profile_private enable row level security;
+create policy "profile_private: el dueño ve y edita lo suyo" on profile_private
+  for all using (auth.uid() = profile_id) with check (auth.uid() = profile_id);
+
+create or replace function public.set_my_phone(telefono text)
+returns void
+language plpgsql
+security definer set search_path = public
+as $$
+begin
+  insert into profile_private (profile_id, phone)
+  values (auth.uid(), telefono)
+  on conflict (profile_id) do update set phone = excluded.phone;
+end;
+$$;
+grant execute on function public.set_my_phone(text) to authenticated;
+
+create or replace function public.obtener_contacto(match_id_input uuid)
+returns table(nombre text, telefono text, direccion text)
+language plpgsql
+security definer set search_path = public
+as $$
+declare
+  v_provider_id uuid;
+  v_seeker_id uuid;
+  v_status text;
+  v_direccion text;
+begin
+  select l.provider_id, r.seeker_id, m.status, m.direccion_exacta
+    into v_provider_id, v_seeker_id, v_status, v_direccion
+  from matches m
+  join listings l on l.id = m.listing_id
+  join requests r on r.id = m.request_id
+  where m.id = match_id_input;
+
+  if v_provider_id is null then
+    raise exception 'Match no encontrado';
+  end if;
+
+  if auth.uid() <> v_provider_id and auth.uid() <> v_seeker_id then
+    raise exception 'No autorizado';
+  end if;
+
+  if v_status <> 'active' then
+    raise exception 'La contratación todavía no fue confirmada por ambas partes';
+  end if;
+
+  if auth.uid() = v_provider_id then
+    return query select p.full_name, null::text, v_direccion
+      from profiles p where p.id = v_seeker_id;
+  else
+    return query select p.full_name, pp.phone, null::text
+      from profiles p left join profile_private pp on pp.profile_id = p.id
+      where p.id = v_provider_id;
+  end if;
+end;
+$$;
+grant execute on function public.obtener_contacto(uuid) to authenticated;
+
+-- ============================================================
+-- Ratings visibles: promedio y conteo por especialista/usuario,
+-- calculado solo sobre reseñas visibles (respeta la RLS de reviews).
+-- ============================================================
+create view provider_ratings as
+select recipient_id as profile_id,
+       round(avg(score)::numeric, 1) as avg_score,
+       count(*) as total_reviews
+from reviews
+where visible = true
+group by recipient_id;
+
+-- ============================================================
 -- Seed — configuración del vertical CM Smart Help
 -- ============================================================
 insert into categories (vertical, name, slug) values

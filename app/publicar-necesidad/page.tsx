@@ -1,20 +1,32 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import BackLink from "@/components/BackLink";
 import { LIMA_DISTRITOS } from "@/config/lima-districts";
 
-const CATEGORY_SLUGS = ["plomeria", "electricidad", "pintura", "carpinteria", "cerrajeria", "gasfiteria", "jardineria"];
-
 export default function PublicarNecesidad() {
   const router = useRouter();
+  const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
+  const [categoryId, setCategoryId] = useState("");
   const [description, setDescription] = useState("");
-  const [categorySlug, setCategorySlug] = useState(CATEGORY_SLUGS[0]);
   const [urgencia, setUrgencia] = useState("media");
   const [distrito, setDistrito] = useState<string>(LIMA_DISTRITOS[0]);
   const [status, setStatus] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadCategories = async () => {
+      const { data } = await supabase
+        .from("categories")
+        .select("id, name")
+        .eq("vertical", "cm_smart_help")
+        .order("name");
+      setCategories(data ?? []);
+      if (data && data[0]) setCategoryId(data[0].id);
+    };
+    loadCategories();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,23 +38,11 @@ export default function PublicarNecesidad() {
       return;
     }
 
-    const { data: category } = await supabase
-      .from("categories")
-      .select("id")
-      .eq("vertical", "cm_smart_help")
-      .eq("slug", categorySlug)
-      .single();
-
-    if (!category) {
-      setStatus("No se encontró la categoría.");
-      return;
-    }
-
     const title = description.length > 60 ? description.slice(0, 60) + "…" : description;
 
     const { error } = await supabase.from("requests").insert({
       seeker_id: userData.user.id,
-      category_id: category.id,
+      category_id: categoryId,
       title,
       description,
       custom_fields: { urgencia, ciudad: "Lima", distrito },
@@ -65,10 +65,10 @@ export default function PublicarNecesidad() {
 
         <div>
           <label className="block text-sm mb-1">Categoría</label>
-          <select className="input-field" value={categorySlug}
-            onChange={(e) => setCategorySlug(e.target.value)}>
-            {CATEGORY_SLUGS.map((slug) => (
-              <option key={slug} value={slug}>{slug}</option>
+          <select className="input-field" value={categoryId}
+            onChange={(e) => setCategoryId(e.target.value)}>
+            {categories.map((c) => (
+              <option key={c.id} value={c.id}>{c.name}</option>
             ))}
           </select>
         </div>
@@ -105,7 +105,7 @@ export default function PublicarNecesidad() {
           </div>
         </div>
 
-        <button type="submit" className="btn-primary">
+        <button type="submit" className="btn-primary" disabled={!categoryId}>
           Publicar
         </button>
 

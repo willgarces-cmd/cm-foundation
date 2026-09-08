@@ -22,6 +22,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <HeaderNav />
         </header>
         <main className="max-w-2xl mx-auto px-4 sm:px-6 py-10">{children}</main>
+        <footer className="border-t border-line px-4 sm:px-6 py-6 text-center text-xs text-gray-400">
+          CM Smart Help — plataforma en fase piloto. ¿Problemas o dudas?{" "}
+          <a href="mailto:soporte@cmsmarthelp.com" className="text-accent hover:underline">
+            soporte@cmsmarthelp.com
+          </a>
+        </footer>
       </body>
     </html>
   );

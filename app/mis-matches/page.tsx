@@ -18,8 +18,8 @@ export default function MisMatches() {
       .from("matches")
       .select(`
         id, status, provider_confirmed, seeker_confirmed, direccion_exacta,
-        listings(id, title, provider_id, profiles(full_name, phone)),
-        requests(id, title, seeker_id, profiles(full_name))
+        listings(id, title, provider_id),
+        requests(id, title, seeker_id)
       `)
       .order("created_at", { ascending: false });
     setMatches(data ?? []);
@@ -46,10 +46,8 @@ export default function MisMatches() {
   };
 
   const guardarTelefono = async (telefono: string) => {
-    if (!userId) return;
-    const { error } = await supabase.from("profiles").update({ phone: telefono }).eq("id", userId);
+    const { error } = await supabase.rpc("set_my_phone", { telefono });
     if (error) setStatus(error.message);
-    else load();
   };
 
   const calificar = async (match: any, score: number, message: string) => {
@@ -96,26 +94,36 @@ function MatchCard({ match, userId, onComplete, onReview, onConfirm, onSaveAddre
   const isProvider = match.listings.provider_id === userId;
   const myConfirmed = isProvider ? match.provider_confirmed : match.seeker_confirmed;
   const otherConfirmed = isProvider ? match.seeker_confirmed : match.provider_confirmed;
-  const otherName = isProvider ? match.requests?.profiles?.full_name : match.listings?.profiles?.full_name;
 
   const [score, setScore] = useState(5);
   const [message, setMessage] = useState("");
   const [direccion, setDireccion] = useState(match.direccion_exacta ?? "");
   const [telefono, setTelefono] = useState("");
+  const [phoneSaved, setPhoneSaved] = useState(false);
   const [msgs, setMsgs] = useState<any[]>([]);
   const [nuevoMensaje, setNuevoMensaje] = useState("");
+  const [contacto, setContacto] = useState<{ nombre: string; telefono: string | null; direccion: string | null } | null>(null);
 
   useEffect(() => {
     const loadMsgs = async () => {
       const { data } = await supabase
         .from("messages")
-        .select("id, sender_id, content, created_at")
+        .select("id, sender_id, content")
         .eq("match_id", match.id)
         .order("created_at", { ascending: true });
       setMsgs(data ?? []);
     };
     loadMsgs();
   }, [match.id]);
+
+  useEffect(() => {
+    if (match.status !== "active") return;
+    const loadContacto = async () => {
+      const { data } = await supabase.rpc("obtener_contacto", { match_id_input: match.id });
+      if (data && data[0]) setContacto(data[0]);
+    };
+    loadContacto();
+  }, [match.id, match.status, match.direccion_exacta]);
 
   const enviarMensaje = async () => {
     if (!nuevoMensaje.trim()) return;
@@ -128,6 +136,11 @@ function MatchCard({ match, userId, onComplete, onReview, onConfirm, onSaveAddre
       setMsgs((prev) => [...prev, { id: Math.random(), sender_id: userId, content: nuevoMensaje }]);
       setNuevoMensaje("");
     }
+  };
+
+  const handleGuardarTelefono = async () => {
+    await onSavePhone(telefono);
+    setPhoneSaved(true);
   };
 
   return (
@@ -165,33 +178,31 @@ function MatchCard({ match, userId, onComplete, onReview, onConfirm, onSaveAddre
           {match.status === "active" ? (
             <div className="text-sm space-y-2">
               <p className="font-medium text-green-700">Contratación confirmada por ambas partes</p>
-              {isProvider ? (
-                <p>
-                  Contacto del usuario: {otherName ?? "—"}
-                  {match.direccion_exacta ? ` — ${match.direccion_exacta}` : " (esperando dirección)"}
-                </p>
-              ) : (
+              {contacto ? (
                 <>
-                  <p>
-                    Contacto del especialista: {otherName ?? "—"} —{" "}
-                    {match.listings?.profiles?.phone ?? "sin teléfono registrado"}
-                  </p>
-                  {!match.direccion_exacta && (
-                    <div className="flex gap-2">
-                      <input className="input-field" placeholder="Tu dirección exacta" value={direccion}
-                        onChange={(e) => setDireccion(e.target.value)} />
-                      <button onClick={() => onSaveAddress(match.id, direccion)} className="btn-primary btn-sm">
-                        Guardar
-                      </button>
-                    </div>
-                  )}
+                  <p>Contacto: {contacto.nombre}</p>
+                  {contacto.telefono && <p>Teléfono: {contacto.telefono}</p>}
+                  {contacto.direccion && <p>Dirección: {contacto.direccion}</p>}
                 </>
+              ) : (
+                <p className="text-gray-400">Cargando datos de contacto...</p>
               )}
-              {isProvider && !match.listings?.profiles?.phone && (
+
+              {!isProvider && !match.direccion_exacta && (
+                <div className="flex gap-2">
+                  <input className="input-field" placeholder="Tu dirección exacta" value={direccion}
+                    onChange={(e) => setDireccion(e.target.value)} />
+                  <button onClick={() => onSaveAddress(match.id, direccion)} className="btn-primary btn-sm">
+                    Guardar
+                  </button>
+                </div>
+              )}
+
+              {isProvider && !phoneSaved && (
                 <div className="flex gap-2">
                   <input className="input-field" placeholder="Tu teléfono de contacto" value={telefono}
                     onChange={(e) => setTelefono(e.target.value)} />
-                  <button onClick={() => onSavePhone(telefono)} className="btn-primary btn-sm">
+                  <button onClick={handleGuardarTelefono} className="btn-primary btn-sm">
                     Guardar
                   </button>
                 </div>
