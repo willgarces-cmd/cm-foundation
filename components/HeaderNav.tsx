@@ -24,11 +24,11 @@ export default function HeaderNav() {
   return (
     <nav className="flex gap-4 text-sm items-center">
       {loggedIn ? (
-        name && <span className="text-ink font-medium truncate max-w-[140px]">Hola, {name.split(" ")[0]}</span>
+        name && <span className="text-white font-medium truncate max-w-[140px]">Hola, {name.split(" ")[0]}</span>
       ) : (
         <>
-          <a href="/login" className="text-ink hover:text-accent">Iniciar sesión</a>
-          <a href="/registro" className="text-accent font-medium hover:text-accentDark">Crear cuenta</a>
+          <a href="/login" className="text-white/80 hover:text-accent">Iniciar sesión</a>
+          <a href="/registro" className="text-accent font-medium hover:text-white">Crear cuenta</a>
         </>
       )}
     </nav>

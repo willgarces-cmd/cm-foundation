@@ -18,11 +18,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className="bg-paper text-ink font-sans min-h-screen">
-        <header className="border-b-2 border-accent bg-white px-4 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-2">
-          <a href="/" className="font-semibold text-lg">CM Smart Help</a>
+        <header className="bg-ink border-b-2 border-accent px-4 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-2">
+          <a href="/" className="font-semibold text-lg text-white">CM Smart Help</a>
           <HeaderNav />
         </header>
-        <main className="max-w-2xl mx-auto px-4 sm:px-6 py-8 pb-24">{children}</main>
+        <main className="max-w-2xl mx-auto px-4 sm:px-6 py-8 pb-28">{children}</main>
         <footer className="border-t border-line px-4 sm:px-6 py-6 text-center text-xs text-gray-400">
           CM Smart Help — plataforma en fase piloto. ¿Problemas o dudas?{" "}
           <a href="mailto:soporte@cmsmarthelp.com" className="text-accent hover:underline">

@@ -8,8 +8,8 @@ import { supabase } from "@/lib/supabaseClient";
 function Tile({ href, icon: Icon, label }: { href: string; icon: any; label: string }) {
   return (
     <a href={href}
-      className="flex flex-col items-center justify-center gap-2 rounded-xl border border-line bg-white shadow-sm px-3 py-6 hover:border-accent transition-colors">
-      <div className="w-11 h-11 rounded-full bg-paper flex items-center justify-center text-ink">
+      className="flex flex-col items-center justify-center gap-2 rounded-xl border border-line bg-white shadow-sm px-3 py-6 hover:border-accent hover:shadow-md transition-all">
+      <div className="w-12 h-12 rounded-full bg-accent/15 flex items-center justify-center text-accentDark">
         <Icon size={22} strokeWidth={1.75} />
       </div>
       <span className="text-sm font-medium text-ink text-center">{label}</span>

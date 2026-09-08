@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { MessageSquare, Send, Phone, MapPin, CheckCircle2, Clock, Star, Loader2 } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
+import StarRatingInput from "@/components/StarRatingInput";
 
 const ESTADO_CONFIG: Record<string, { label: string; className: string; icon: any }> = {
   pending: { label: "Pendiente de contratación", className: "bg-amber-100 text-amber-800", icon: Clock },
@@ -254,10 +255,7 @@ function MatchCard({ match, userId, onComplete, onReview, onConfirm, onSaveAddre
           <p className="text-sm font-medium flex items-center gap-1.5">
             <Star size={14} className="text-accent" /> Calificar
           </p>
-          <select className="input-field btn-sm w-auto" value={score}
-            onChange={(e) => setScore(Number(e.target.value))}>
-            {[5, 4, 3, 2, 1].map((n) => <option key={n} value={n}>{n} estrellas</option>)}
-          </select>
+          <StarRatingInput value={score} onChange={setScore} />
           <textarea className="input-field" rows={2} placeholder="Mensaje opcional"
             value={message} onChange={(e) => setMessage(e.target.value)} />
           <button onClick={() => onReview(match, score, message)} className="btn-primary btn-sm">Enviar calificación</button>
