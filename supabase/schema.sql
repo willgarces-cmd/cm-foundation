@@ -208,6 +208,83 @@ alter table verifications
   add constraint verifications_provider_id_fkey foreign key (provider_id) references profiles(id) on delete cascade;
 
 -- ============================================================
+-- Capa de agentes IA — infraestructura genérica (núcleo, no por vertical)
+-- ============================================================
+create table agent_logs (
+  id uuid primary key default gen_random_uuid(),
+  agent_name text not null,
+  vertical text not null,            -- 'core' para pruebas de infraestructura, o el vertical real (ej. 'cm_smart_help')
+  input jsonb not null,
+  output jsonb,
+  status text not null default 'ok', -- ok | error
+  created_at timestamptz not null default now()
+);
+
+alter table agent_logs enable row level security;
+-- A propósito, sin políticas de select/insert para anon/authenticated:
+-- estos logs solo se escriben y leen desde el backend (service role),
+-- nunca desde el navegador del usuario. Se revisan directo en Supabase.
+
+-- ============================================================
+-- Contratación con doble confirmación (revela contacto solo si ambas partes aceptan)
+-- ============================================================
+alter table matches add column provider_confirmed boolean not null default false;
+alter table matches add column seeker_confirmed boolean not null default false;
+alter table matches add column direccion_exacta text;
+
+create or replace function public.confirmar_contratacion(match_id_input uuid)
+returns void
+language plpgsql
+security definer set search_path = public
+as $$
+declare
+  v_provider_id uuid;
+  v_seeker_id uuid;
+begin
+  select l.provider_id, r.seeker_id into v_provider_id, v_seeker_id
+  from matches m
+  join listings l on l.id = m.listing_id
+  join requests r on r.id = m.request_id
+  where m.id = match_id_input;
+
+  if v_provider_id is null then
+    raise exception 'Match no encontrado';
+  end if;
+
+  if auth.uid() <> v_provider_id and auth.uid() <> v_seeker_id then
+    raise exception 'No autorizado';
+  end if;
+
+  if auth.uid() = v_provider_id then
+    update matches set provider_confirmed = true where id = match_id_input;
+  end if;
+  if auth.uid() = v_seeker_id then
+    update matches set seeker_confirmed = true where id = match_id_input;
+  end if;
+
+  update matches
+    set status = 'active'
+    where id = match_id_input
+      and provider_confirmed and seeker_confirmed
+      and status = 'pending';
+end;
+$$;
+
+grant execute on function public.confirmar_contratacion(uuid) to authenticated;
+
+-- Corrección de seguridad: la política anterior de mensajes solo revisaba que el
+-- remitente fuera quien dice ser, pero no que perteneciera al match. La reemplazamos.
+drop policy "messages: enviar si eres parte" on messages;
+create policy "messages: enviar si eres parte" on messages for insert with check (
+  sender_id = auth.uid() and exists (
+    select 1 from matches m
+    join listings l on l.id = m.listing_id
+    join requests r on r.id = m.request_id
+    where m.id = match_id and (l.provider_id = auth.uid() or r.seeker_id = auth.uid())
+  )
+);
+
+-- ============================================================
 -- Seed — configuración del vertical CM Smart Help
 -- ============================================================
 insert into categories (vertical, name, slug) values

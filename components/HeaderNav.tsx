@@ -32,7 +32,7 @@ export default function HeaderNav() {
     <nav className="flex gap-4 text-sm items-center">
       {loggedIn ? (
         <>
-          {name && <span className="text-ink font-medium">Hola, {name.split(" ")[0]}</span>}
+          {name && <span className="text-ink font-medium truncate max-w-[100px] sm:max-w-none">Hola, {name.split(" ")[0]}</span>}
           <button onClick={cerrarSesion} className="text-gray-500 hover:text-accent">
             Cerrar sesión
           </button>

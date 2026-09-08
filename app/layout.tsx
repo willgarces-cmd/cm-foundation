@@ -17,11 +17,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className="bg-paper text-ink font-sans min-h-screen">
-        <header className="border-b-2 border-accent bg-white px-6 py-4 flex items-center justify-between">
+        <header className="border-b-2 border-accent bg-white px-4 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-2">
           <a href="/" className="font-semibold text-lg">CM Smart Help</a>
           <HeaderNav />
         </header>
-        <main className="max-w-2xl mx-auto px-6 py-10">{children}</main>
+        <main className="max-w-2xl mx-auto px-4 sm:px-6 py-10">{children}</main>
       </body>
     </html>
   );

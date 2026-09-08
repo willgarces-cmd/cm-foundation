@@ -91,7 +91,7 @@ export default function PublicarServicio() {
 
         <div>
           <label className="block text-sm mb-2">Distritos donde das cobertura</label>
-          <div className="grid grid-cols-2 gap-1 max-h-56 overflow-y-auto border border-line rounded-md p-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 max-h-56 overflow-y-auto border border-line rounded-md p-3">
             {LIMA_DISTRITOS.map((d) => (
               <label key={d} className="flex items-center gap-2 text-sm">
                 <input type="checkbox" checked={zonaCobertura.includes(d)}

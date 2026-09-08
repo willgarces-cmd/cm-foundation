@@ -48,6 +48,7 @@ export default function Menu() {
           <section className="space-y-3">
             <h2 className="text-sm font-medium text-ink border-l-4 border-ink pl-2">Tengo una necesidad</h2>
             <a href="/publicar-necesidad" className="nav-link">Publicar una necesidad</a>
+            <a href="/mis-necesidades" className="nav-link">Mis necesidades publicadas</a>
             <a href="/especialistas" className="nav-link">Ver especialistas disponibles</a>
           </section>
         )}
@@ -69,6 +70,10 @@ export default function Menu() {
 
       <a href="/mis-matches" className="nav-link block text-center">
         Mis matches y calificaciones
+      </a>
+
+      <a href="/agentes-test" className="block text-center text-xs text-gray-400 hover:text-accent">
+        Probar infraestructura de agentes (interno)
       </a>
     </div>
   );
