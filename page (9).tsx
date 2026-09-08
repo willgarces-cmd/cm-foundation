@@ -1,0 +1,54 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabaseClient";
+import BackLink from "@/components/BackLink";
+
+export default function Login() {
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [status, setStatus] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      setStatus(error.message);
+      return;
+    }
+    router.push("/menu");
+  };
+
+  return (
+    <div className="space-y-6">
+      <BackLink />
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <h1 className="page-title">Iniciar sesión</h1>
+
+      <div>
+        <label className="block text-sm mb-1">Correo</label>
+        <input type="email" className="input-field" value={email}
+          onChange={(e) => setEmail(e.target.value)} required />
+      </div>
+
+      <div>
+        <label className="block text-sm mb-1">Contraseña</label>
+        <input type="password" className="input-field" value={password}
+          onChange={(e) => setPassword(e.target.value)} required />
+      </div>
+
+      <button type="submit" className="btn-primary">
+        Entrar
+      </button>
+
+      <a href="/recuperar-password" className="block text-sm text-accent underline">
+        ¿Olvidaste tu contraseña?
+      </a>
+
+        {status && <p className="text-sm text-gray-600">{status}</p>}
+      </form>
+    </div>
+  );
+}
