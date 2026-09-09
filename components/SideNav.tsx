@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
-import { Home, MessageSquare, User } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { Home, MessageSquare, User, LogOut } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 
 const ITEMS = [
@@ -13,6 +13,7 @@ const ITEMS = [
 
 export default function SideNav() {
   const pathname = usePathname();
+  const router = useRouter();
   const [loggedIn, setLoggedIn] = useState(false);
 
   useEffect(() => {
@@ -22,6 +23,11 @@ export default function SideNav() {
   }, []);
 
   if (!loggedIn) return null;
+
+  const cerrarSesion = async () => {
+    await supabase.auth.signOut();
+    router.push("/");
+  };
 
   return (
     <aside className="hidden lg:flex flex-col items-center gap-8 w-24 shrink-0 bg-ink py-8 sticky top-0 self-start h-screen">
@@ -37,6 +43,14 @@ export default function SideNav() {
           </a>
         );
       })}
+
+      <div className="flex-1" />
+
+      <button onClick={cerrarSesion}
+        className="flex flex-col items-center gap-1.5 text-xs text-white/50 hover:text-white/80 transition-colors">
+        <LogOut size={22} strokeWidth={1.75} />
+        Salir
+      </button>
     </aside>
   );
 }
