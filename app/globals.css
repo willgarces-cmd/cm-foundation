@@ -4,24 +4,24 @@
 
 @layer components {
   .btn-primary {
-    @apply bg-ink text-white rounded-md px-4 py-2.5 font-medium hover:bg-[#0F1B29] transition-colors;
+    @apply bg-ink text-white rounded-lg px-5 py-3 font-medium shadow-warm hover:bg-[#0F1B29] hover:-translate-y-0.5 transition-all;
   }
   .btn-sm {
     @apply px-3 py-1.5 text-sm;
   }
   .btn-outline {
-    @apply border border-ink text-ink rounded-md px-4 py-2.5 font-medium hover:bg-ink hover:text-white transition-colors;
+    @apply border border-ink text-ink rounded-lg px-5 py-3 font-medium hover:bg-ink hover:text-white transition-colors;
   }
   .card {
-    @apply border border-line rounded-lg bg-white px-4 py-3 shadow-sm;
+    @apply border border-line/70 rounded-xl bg-white px-4 py-4 shadow-card;
   }
   .input-field {
-    @apply border border-line rounded-md w-full px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent;
+    @apply border border-line rounded-lg w-full px-3 py-2.5 bg-white focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-shadow;
   }
   .page-title {
-    @apply text-xl font-semibold text-ink;
+    @apply font-serif text-[1.75rem] leading-tight font-semibold text-ink;
   }
   .nav-link {
-    @apply block border border-line rounded-lg px-4 py-3 bg-white hover:border-accent transition-colors;
+    @apply block border border-line/70 rounded-xl px-4 py-4 bg-white shadow-card hover:border-accent hover:shadow-warm hover:-translate-y-0.5 transition-all;
   }
 }

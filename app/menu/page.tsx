@@ -8,8 +8,8 @@ import { supabase } from "@/lib/supabaseClient";
 function Tile({ href, icon: Icon, label }: { href: string; icon: any; label: string }) {
   return (
     <a href={href}
-      className="flex flex-col items-center justify-center gap-2 rounded-xl border border-line bg-white shadow-sm px-3 py-6 hover:border-accent hover:shadow-md transition-all">
-      <div className="w-12 h-12 rounded-full bg-accent/15 flex items-center justify-center text-accentDark">
+      className="flex flex-col items-center justify-center gap-2.5 rounded-2xl border border-line/70 bg-white shadow-card px-3 py-7 hover:border-accent hover:shadow-warm hover:-translate-y-0.5 transition-all">
+      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-accent/25 to-accent/10 flex items-center justify-center text-accentDark">
         <Icon size={22} strokeWidth={1.75} />
       </div>
       <span className="text-sm font-medium text-ink text-center">{label}</span>
@@ -46,7 +46,7 @@ export default function Menu() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-semibold text-ink">
+        <h1 className="font-serif text-3xl font-semibold text-ink">
           {isSeeker && isProvider ? "¿Qué necesitas hacer?" : isProvider ? "Tu espacio de trabajo" : "¿En qué te ayudamos?"}
         </h1>
       </div>

@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ["./app/**/*.{ts,tsx}", "./config/**/*.{ts,tsx}"],
+  content: ["./app/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./config/**/*.{ts,tsx}"],
   theme: {
     extend: {
       colors: {
@@ -12,6 +12,11 @@ module.exports = {
       },
       fontFamily: {
         sans: ['"Work Sans"', "ui-sans-serif", "system-ui", "sans-serif"],
+        serif: ['"Fraunces"', "ui-serif", "Georgia", "serif"],
+      },
+      boxShadow: {
+        warm: "0 4px 20px -4px rgba(27, 42, 61, 0.12)",
+        card: "0 2px 12px -2px rgba(27, 42, 61, 0.08)",
       },
     },
   },

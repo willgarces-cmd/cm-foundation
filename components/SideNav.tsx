@@ -11,7 +11,7 @@ const ITEMS = [
   { href: "/cuenta", label: "Cuenta", icon: User },
 ];
 
-export default function BottomNav() {
+export default function SideNav() {
   const pathname = usePathname();
   const [loggedIn, setLoggedIn] = useState(false);
 
@@ -24,21 +24,19 @@ export default function BottomNav() {
   if (!loggedIn) return null;
 
   return (
-    <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-20 flex justify-center px-3 pb-3">
-      <div className="max-w-2xl w-full bg-ink rounded-2xl shadow-lg flex justify-around items-center h-16">
-        {ITEMS.map(({ href, label, icon: Icon }) => {
-          const active = pathname === href;
-          return (
-            <a key={href} href={href}
-              className={`flex flex-col items-center justify-center gap-1 flex-1 h-full text-xs rounded-2xl transition-colors ${
-                active ? "text-accent" : "text-white/50 hover:text-white/80"
-              }`}>
-              <Icon size={24} strokeWidth={active ? 2.25 : 1.75} />
-              {label}
-            </a>
-          );
-        })}
-      </div>
-    </nav>
+    <aside className="hidden lg:flex flex-col items-center gap-8 w-24 shrink-0 bg-ink py-8 sticky top-0 self-start h-screen">
+      {ITEMS.map(({ href, label, icon: Icon }) => {
+        const active = pathname === href;
+        return (
+          <a key={href} href={href}
+            className={`flex flex-col items-center gap-1.5 text-xs transition-colors ${
+              active ? "text-accent" : "text-white/50 hover:text-white/80"
+            }`}>
+            <Icon size={24} strokeWidth={active ? 2.25 : 1.75} />
+            {label}
+          </a>
+        );
+      })}
+    </aside>
   );
 }
