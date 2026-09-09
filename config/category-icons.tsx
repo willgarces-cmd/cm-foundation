@@ -1,4 +1,4 @@
-import { Wrench, Zap, Paintbrush, Hammer, KeyRound, Flame, Sprout, type LucideIcon } from "lucide-react";
+import { Wrench, Zap, Paintbrush, Hammer, KeyRound, Flame, Sprout, HardHat, type LucideIcon } from "lucide-react";
 
 export const CATEGORY_ICONS: Record<string, LucideIcon> = {
   "Plomería": Wrench,
@@ -8,6 +8,7 @@ export const CATEGORY_ICONS: Record<string, LucideIcon> = {
   "Cerrajería": KeyRound,
   "Gasfitería": Flame,
   "Jardinería": Sprout,
+  "Albañilería": HardHat,
 };
 
 export function getCategoryIcon(name?: string): LucideIcon {

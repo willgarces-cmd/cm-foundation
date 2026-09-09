@@ -378,4 +378,5 @@ insert into categories (vertical, name, slug) values
   ('cm_smart_help', 'Carpintería', 'carpinteria'),
   ('cm_smart_help', 'Cerrajería', 'cerrajeria'),
   ('cm_smart_help', 'Gasfitería', 'gasfiteria'),
-  ('cm_smart_help', 'Jardinería', 'jardineria');
+  ('cm_smart_help', 'Jardinería', 'jardineria'),
+  ('cm_smart_help', 'Albañilería', 'albanileria');

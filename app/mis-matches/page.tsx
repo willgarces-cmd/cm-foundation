@@ -118,7 +118,7 @@ function MatchCard({ match, userId, onComplete, onReview, onConfirm, onSaveAddre
   const myConfirmed = isProvider ? match.provider_confirmed : match.seeker_confirmed;
   const otherConfirmed = isProvider ? match.seeker_confirmed : match.provider_confirmed;
 
-  const [score, setScore] = useState(5);
+  const [score, setScore] = useState(0);
   const [message, setMessage] = useState("");
   const [direccion, setDireccion] = useState(match.direccion_exacta ?? "");
   const [telefono, setTelefono] = useState("");
@@ -258,7 +258,11 @@ function MatchCard({ match, userId, onComplete, onReview, onConfirm, onSaveAddre
           <StarRatingInput value={score} onChange={setScore} />
           <textarea className="input-field" rows={2} placeholder="Mensaje opcional"
             value={message} onChange={(e) => setMessage(e.target.value)} />
-          <button onClick={() => onReview(match, score, message)} className="btn-primary btn-sm">Enviar calificación</button>
+          <button onClick={() => onReview(match, score, message)} disabled={score === 0}
+            className="btn-primary btn-sm disabled:opacity-40 disabled:cursor-not-allowed">
+            Enviar calificación
+          </button>
+          {score === 0 && <p className="text-xs text-gray-400">Elige al menos una estrella para calificar.</p>}
         </div>
       )}
     </div>
