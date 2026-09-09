@@ -43,7 +43,8 @@ export default async function Especialistas() {
         <div className="space-y-3">
           {listings?.map((l: any) => {
             const rating = ratingByProvider[l.provider_id];
-            const zonas: string[] = l.custom_fields?.zona_cobertura ?? [];
+            const rawZonas = l.custom_fields?.zona_cobertura;
+          const zonas: string[] = Array.isArray(rawZonas) ? rawZonas : rawZonas ? [rawZonas] : [];
             const Icon = getCategoryIcon(l.categories?.name);
             return (
               <div key={l.id} className="card">
