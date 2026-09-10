@@ -135,6 +135,19 @@ function MatchCard({ match, userId, onComplete, onReview, onConfirm, onSaveAddre
       setMsgs(data ?? []);
     };
     loadMsgs();
+
+    const channel = supabase
+      .channel(`messages-${match.id}`)
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "messages", filter: `match_id=eq.${match.id}` },
+        (payload) => {
+          setMsgs((prev) => (prev.some((m) => m.id === payload.new.id) ? prev : [...prev, payload.new as any]));
+        }
+      )
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
   }, [match.id]);
 
   useEffect(() => {
@@ -151,10 +164,7 @@ function MatchCard({ match, userId, onComplete, onReview, onConfirm, onSaveAddre
     const { error } = await supabase.from("messages").insert({
       match_id: match.id, sender_id: userId, content: nuevoMensaje,
     });
-    if (!error) {
-      setMsgs((prev) => [...prev, { id: Math.random(), sender_id: userId, content: nuevoMensaje }]);
-      setNuevoMensaje("");
-    }
+    if (!error) setNuevoMensaje("");
   };
 
   const handleGuardarTelefono = async () => {
